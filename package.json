@@ -100,7 +100,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "tsc --noEmit -p ./",
-    "test:unit": "tsc -p tsconfig.test.json && node out-test/test/suite/manifest.test.js && node out-test/test/suite/config.test.js && node out-test/test/suite/syntax.test.js",
+    "test:unit": "tsc -p tsconfig.test.json && node out-test/test/suite/manifest.test.js && node out-test/test/suite/config.test.js && node out-test/test/suite/activation.test.js && node out-test/test/suite/syntax.test.js",
     "test": "npm run test:unit",
     "package": "vsce package"
   },

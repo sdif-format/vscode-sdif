@@ -1,9 +1,5 @@
 import * as vscode from "vscode";
-import {
-  LanguageClient,
-  type LanguageClientOptions,
-  State,
-} from "vscode-languageclient/node";
+import type { LanguageClient, LanguageClientOptions } from "vscode-languageclient/node";
 
 import { buildServerOptions, resolveServerConfiguration } from "./config";
 
@@ -51,14 +47,14 @@ async function startLanguageClient(): Promise<void> {
     traceOutputChannel: outputChannel,
   };
 
-  client = new LanguageClient(
-    LANGUAGE_CLIENT_ID,
-    LANGUAGE_CLIENT_NAME,
-    buildServerOptions(configuration),
-    clientOptions,
-  );
-
   try {
+    const { LanguageClient } = await import("vscode-languageclient/node");
+    client = new LanguageClient(
+      LANGUAGE_CLIENT_ID,
+      LANGUAGE_CLIENT_NAME,
+      buildServerOptions(configuration),
+      clientOptions,
+    );
     await client.start();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
@@ -78,7 +74,5 @@ async function stopLanguageClient(): Promise<void> {
 
   const activeClient = client;
   client = undefined;
-  if (activeClient.state !== State.Stopped) {
-    await activeClient.stop();
-  }
+  await activeClient.stop();
 }
