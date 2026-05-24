@@ -1,0 +1,5 @@
+@sdif 1.0
+kind Dataset
+Person people:
+id	name
+p1	"Ada Lovelace"
