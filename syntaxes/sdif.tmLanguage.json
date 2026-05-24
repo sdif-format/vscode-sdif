@@ -1,18 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "name": "SDIF",
+  "name": "SDIF Fallback",
   "scopeName": "source.sdif",
   "patterns": [
     { "include": "#comments" },
     { "include": "#directives" },
     { "include": "#tripleQuotedNarrative" },
-    { "include": "#quotedStrings" },
-    { "include": "#aliasHeader" },
-    { "include": "#groupedRelation" },
-    { "include": "#relationBlock" },
-    { "include": "#rulesBlock" },
-    { "include": "#blockHeaders" },
-    { "include": "#reservedIdentifiers" }
+    { "include": "#quotedStrings" }
   ],
   "repository": {
     "comments": {
@@ -55,70 +49,6 @@
         {
           "name": "string.quoted.double.sdif",
           "match": "\\\"(?:[^\\\\\\\"]|\\\\.)*\\\""
-        }
-      ]
-    },
-    "aliasHeader": {
-      "patterns": [
-        {
-          "name": "meta.alias-header.sdif",
-          "match": "^(alias)(\\[)([^\\]]*)(\\])\\s*:",
-          "captures": {
-            "1": { "name": "keyword.control.alias.sdif" },
-            "2": { "name": "punctuation.section.brackets.begin.sdif" },
-            "3": { "name": "variable.parameter.alias.sdif" },
-            "4": { "name": "punctuation.section.brackets.end.sdif" }
-          }
-        }
-      ]
-    },
-    "groupedRelation": {
-      "patterns": [
-        {
-          "name": "meta.relation.grouped.sdif",
-          "match": "^(rel)(\\[)([^\\]]+)(\\])\\s*:",
-          "captures": {
-            "1": { "name": "keyword.control.relation.sdif" },
-            "2": { "name": "punctuation.section.brackets.begin.sdif" },
-            "3": { "name": "variable.other.subject.sdif" },
-            "4": { "name": "punctuation.section.brackets.end.sdif" }
-          }
-        }
-      ]
-    },
-    "relationBlock": {
-      "patterns": [
-        {
-          "name": "keyword.control.relation.sdif",
-          "match": "^(rel)\\s*:"
-        }
-      ]
-    },
-    "rulesBlock": {
-      "patterns": [
-        {
-          "name": "keyword.control.rules.sdif",
-          "match": "^(rules)\\s*:"
-        }
-      ]
-    },
-    "blockHeaders": {
-      "patterns": [
-        {
-          "name": "meta.block.header.sdif",
-          "match": "^([A-Za-z_][A-Za-z0-9_-]*)(?:\\s+([A-Za-z_][A-Za-z0-9_-]*))?\\s*:",
-          "captures": {
-            "1": { "name": "entity.name.type.sdif" },
-            "2": { "name": "entity.name.tag.sdif" }
-          }
-        }
-      ]
-    },
-    "reservedIdentifiers": {
-      "patterns": [
-        {
-          "name": "constant.language.sdif",
-          "match": "\\b__(?:item|value)\\b"
         }
       ]
     }

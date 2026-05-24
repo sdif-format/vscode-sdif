@@ -2,7 +2,7 @@
   "name": "vscode-sdif",
   "displayName": "SDIF",
   "description": "VS Code language support for the Semantic Data Interchange Format.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "sdif-format",
   "license": "MIT",
   "private": true,

@@ -3,8 +3,10 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 type PackageManifest = {
+  version: string;
   contributes: {
     languages: Array<{ id: string; extensions: string[] }>;
+    grammars: Array<{ language: string; scopeName: string; path: string }>;
     commands: Array<{ command: string }>;
     configuration: { properties: Record<string, { default: unknown }> };
   };
@@ -13,9 +15,16 @@ type PackageManifest = {
 const manifestPath = path.resolve(__dirname, "../../../package.json");
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as PackageManifest;
 
+assert.equal(manifest.version, "1.0.0");
+
 const sdifLanguage = manifest.contributes.languages.find((language) => language.id === "sdif");
 assert.ok(sdifLanguage, "manifest registers the sdif language");
 assert.deepEqual(sdifLanguage.extensions, [".sdif", ".sdif.ai", ".sdif.canon"]);
+
+const grammar = manifest.contributes.grammars.find((entry) => entry.language === "sdif");
+assert.ok(grammar, "manifest registers an SDIF TextMate fallback grammar");
+assert.equal(grammar.scopeName, "source.sdif");
+assert.equal(grammar.path, "./syntaxes/sdif.tmLanguage.json");
 
 const commands = manifest.contributes.commands.map((command) => command.command).sort();
 assert.deepEqual(commands, ["sdif.restartServer", "sdif.showOutput"]);

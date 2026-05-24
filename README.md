@@ -5,13 +5,30 @@ VS Code language support for the Semantic Data Interchange Format (SDIF).
 ## Features
 
 - Registers `.sdif`, `.sdif.ai`, and `.sdif.canon` files as SDIF documents.
-- Provides syntax highlighting for directives, blocks, relations, aliases, strings, comments, and narrative sections.
 - Starts the external Rust `sdif-lsp` language server over stdio when available.
-- Keeps syntax highlighting available even when the language server is disabled or missing.
+- Uses LSP semantic tokens for structural/editorial highlighting.
+- Keeps a minimal TextMate fallback for comments, directives, quoted strings, and narrative delimiters while the language server starts or is disabled.
+
+## Highlighting architecture
+
+`vscode-sdif` is not the source of truth for SDIF highlighting.
+
+The highlighting chain is:
+
+```text
+sdif-spec
+  -> tree-sitter-sdif/queries/highlights.scm
+  -> sdif-lsp semantic tokens
+  -> vscode-sdif client
+```
+
+`tree-sitter-sdif/queries/highlights.scm` is the single structural/editorial highlighting source. The bundled TextMate grammar is deliberately minimal and non-normative; it exists only as a startup/offline fallback and must not duplicate alias, relation, table, rule, or grouped-relation highlighting semantics.
+
+The Rust `sdif-rs` parser remains the normative source for diagnostics and semantic parsing. `sdif-lsp` uses `sdif-rs` for diagnostics, hover, and completions where semantic parsing applies, and uses `tree-sitter-sdif` for editor highlighting tokens.
 
 ## Language server
 
-`vscode-sdif` is only the VS Code client. Diagnostics, hover, completions, and formatting belong in the Rust `sdif-lsp` server.
+`vscode-sdif` is only the VS Code client. Diagnostics, hover, completions, and semantic tokens belong in the Rust `sdif-lsp` server.
 
 By default the extension runs:
 
@@ -28,7 +45,7 @@ Configure a custom binary path if the command is not on `PATH`:
 }
 ```
 
-Disable the language server while keeping highlighting:
+Disable the language server while keeping fallback highlighting:
 
 ```json
 {
@@ -45,6 +62,9 @@ npm test
 npm run package
 ```
 
-## Boundary
+## Boundaries
 
-The Python `sdif` parser remains the normative format implementation. The `tree-sitter-sdif` grammar informs editor highlighting. This extension should not duplicate SDIF parser semantics; it should delegate language intelligence to `sdif-lsp`.
+- No language server binary is bundled in this extension.
+- No automatic language server download is performed.
+- Formatting is intentionally out of scope for v1.0.
+- VS Code does not load tree-sitter directly; tree-sitter integration is mediated by `sdif-lsp` semantic tokens.

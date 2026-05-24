@@ -15,13 +15,19 @@ const grammar = JSON.parse(
 assert.equal(grammar.scopeName, "source.sdif");
 for (const key of [
   "directives",
-  "aliasHeader",
-  "groupedRelation",
-  "relationBlock",
-  "rulesBlock",
+  "comments",
+  "quotedStrings",
   "tripleQuotedNarrative",
 ]) {
   assert.ok(grammar.repository[key], `grammar includes ${key}`);
+}
+
+for (const nonFallbackKey of ["aliasHeader", "groupedRelation", "relationBlock", "rulesBlock"]) {
+  assert.equal(
+    grammar.repository[nonFallbackKey],
+    undefined,
+    `fallback grammar does not duplicate structural highlighter: ${nonFallbackKey}`,
+  );
 }
 
 for (const fixture of ["example.sdif", "example.sdif.ai", "example.sdif.canon"]) {
