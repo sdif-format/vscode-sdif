@@ -102,7 +102,7 @@
     "lint": "tsc --noEmit -p ./",
     "test:unit": "tsc -p tsconfig.test.json && node out-test/test/suite/manifest.test.js && node out-test/test/suite/config.test.js && node out-test/test/suite/syntax.test.js",
     "test": "npm run test:unit",
-    "package": "vsce package --no-dependencies"
+    "package": "vsce package"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1"

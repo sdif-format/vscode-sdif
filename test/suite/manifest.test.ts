@@ -4,6 +4,7 @@ import path from "node:path";
 
 type PackageManifest = {
   version: string;
+  scripts: Record<string, string>;
   contributes: {
     languages: Array<{ id: string; extensions: string[] }>;
     grammars: Array<{ language: string; scopeName: string; path: string }>;
@@ -16,6 +17,7 @@ const manifestPath = path.resolve(__dirname, "../../../package.json");
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as PackageManifest;
 
 assert.equal(manifest.version, "1.0.0");
+assert.equal(manifest.scripts.package, "vsce package");
 
 const sdifLanguage = manifest.contributes.languages.find((language) => language.id === "sdif");
 assert.ok(sdifLanguage, "manifest registers the sdif language");
