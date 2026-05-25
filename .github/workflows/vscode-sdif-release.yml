@@ -27,8 +27,17 @@ jobs:
             src_path: sdif-lsp/target/release/sdif-lsp.exe
 
     steps:
-      - name: Checkout repository
+      - name: Checkout sdif-lsp
         uses: actions/checkout@v4
+        with:
+          repository: sdif-format/sdif-lsp
+          path: sdif-lsp
+
+      - name: Checkout sdif-rs
+        uses: actions/checkout@v4
+        with:
+          repository: sdif-format/sdif-rs
+          path: sdif-rs
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -48,8 +57,16 @@ jobs:
     needs: build-lsp
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout vscode-sdif
         uses: actions/checkout@v4
+        with:
+          path: vscode-sdif
+
+      - name: Checkout sdif-lsp
+        uses: actions/checkout@v4
+        with:
+          repository: sdif-format/sdif-lsp
+          path: sdif-lsp
 
       - name: Install Node.js
         uses: actions/setup-node@v4
