@@ -33,6 +33,7 @@ assert.deepEqual(commands, ["sdif.restartServer", "sdif.showOutput"]);
 
 const properties = manifest.contributes.configuration.properties;
 assert.equal(properties["sdif.server.enabled"]?.default, true);
+assert.equal(properties["sdif.server.path"]?.default, "");
 assert.equal(properties["sdif.server.command"]?.default, "sdif-lsp");
 assert.deepEqual(properties["sdif.server.args"]?.default, []);
 assert.equal(properties["sdif.trace.server"]?.default, "off");
