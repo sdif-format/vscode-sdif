@@ -19,20 +19,28 @@ from pathlib import Path
 FIXTURE_SDIF_NAME = "highlighting.sdif"
 FIXTURE_SDIF_AI_NAME = "highlighting.sdif.ai"
 FIXTURE_BENCHMARK_NAME = "benchmark-report.sdif"
+FIXTURE_ASSISTANT_NAME = "assistant-reference.sdif"
+FIXTURE_ASSISTANT_AI_NAME = "assistant-reference.sdif.ai"
 TREE_SITTER_REPORTS = (
     (FIXTURE_SDIF_NAME, "highlighting.sdif.tree-sitter-captures.json"),
     (FIXTURE_SDIF_AI_NAME, "highlighting.sdif-ai.tree-sitter-captures.json"),
     (FIXTURE_BENCHMARK_NAME, "benchmark-report.sdif.tree-sitter-captures.json"),
+    (FIXTURE_ASSISTANT_NAME, "assistant-reference.sdif.tree-sitter-captures.json"),
+    (FIXTURE_ASSISTANT_AI_NAME, "assistant-reference.sdif-ai.tree-sitter-captures.json"),
 )
 SEMANTIC_TOKEN_REPORTS = (
     (FIXTURE_SDIF_NAME, "highlighting.sdif.semantic-tokens.json"),
     (FIXTURE_SDIF_AI_NAME, "highlighting.sdif-ai.semantic-tokens.json"),
     (FIXTURE_BENCHMARK_NAME, "benchmark-report.sdif.semantic-tokens.json"),
+    (FIXTURE_ASSISTANT_NAME, "assistant-reference.sdif.semantic-tokens.json"),
+    (FIXTURE_ASSISTANT_AI_NAME, "assistant-reference.sdif-ai.semantic-tokens.json"),
 )
 MAPPING_REPORTS = (
     (FIXTURE_SDIF_NAME, "highlighting.sdif.capture-semantic-map.json"),
     (FIXTURE_SDIF_AI_NAME, "highlighting.sdif-ai.capture-semantic-map.json"),
     (FIXTURE_BENCHMARK_NAME, "benchmark-report.sdif.capture-semantic-map.json"),
+    (FIXTURE_ASSISTANT_NAME, "assistant-reference.sdif.capture-semantic-map.json"),
+    (FIXTURE_ASSISTANT_AI_NAME, "assistant-reference.sdif-ai.capture-semantic-map.json"),
 )
 CAPTURE_TO_SEMANTIC_TYPE = {
     "keyword": "keyword",
@@ -79,6 +87,8 @@ def main() -> int:
         FIXTURE_SDIF_NAME: fixture_dir / FIXTURE_SDIF_NAME,
         FIXTURE_SDIF_AI_NAME: fixture_dir / FIXTURE_SDIF_AI_NAME,
         FIXTURE_BENCHMARK_NAME: fixture_dir / FIXTURE_BENCHMARK_NAME,
+        FIXTURE_ASSISTANT_NAME: fixture_dir / FIXTURE_ASSISTANT_NAME,
+        FIXTURE_ASSISTANT_AI_NAME: fixture_dir / FIXTURE_ASSISTANT_AI_NAME,
     }
 
     for fixture in fixtures.values():
@@ -104,15 +114,12 @@ def main() -> int:
         return 1
 
     print("Editor highlighting verification reports generated successfully:")
-    print(f"  - {reports_dir}/highlighting.sdif.tree-sitter-captures.json")
-    print(f"  - {reports_dir}/highlighting.sdif.semantic-tokens.json")
-    print(f"  - {reports_dir}/highlighting.sdif-ai.tree-sitter-captures.json")
-    print(f"  - {reports_dir}/highlighting.sdif-ai.semantic-tokens.json")
-    print(f"  - {reports_dir}/highlighting.sdif.capture-semantic-map.json")
-    print(f"  - {reports_dir}/highlighting.sdif-ai.capture-semantic-map.json")
-    print(f"  - {reports_dir}/benchmark-report.sdif.tree-sitter-captures.json")
-    print(f"  - {reports_dir}/benchmark-report.sdif.semantic-tokens.json")
-    print(f"  - {reports_dir}/benchmark-report.sdif.capture-semantic-map.json")
+    for _, output_name in (
+        *TREE_SITTER_REPORTS,
+        *SEMANTIC_TOKEN_REPORTS,
+        *MAPPING_REPORTS,
+    ):
+        print(f"  - {reports_dir}/{output_name}")
     return 0
 
 
@@ -240,11 +247,15 @@ def _generate_mapping_reports(
         "highlighting.sdif": "highlighting.sdif.tree-sitter-captures.json",
         "highlighting.sdif.ai": "highlighting.sdif-ai.tree-sitter-captures.json",
         "benchmark-report.sdif": "benchmark-report.sdif.tree-sitter-captures.json",
+        "assistant-reference.sdif": "assistant-reference.sdif.tree-sitter-captures.json",
+        "assistant-reference.sdif.ai": "assistant-reference.sdif-ai.tree-sitter-captures.json",
     }
     semantic_outputs = {
         "highlighting.sdif": "highlighting.sdif.semantic-tokens.json",
         "highlighting.sdif.ai": "highlighting.sdif-ai.semantic-tokens.json",
         "benchmark-report.sdif": "benchmark-report.sdif.semantic-tokens.json",
+        "assistant-reference.sdif": "assistant-reference.sdif.semantic-tokens.json",
+        "assistant-reference.sdif.ai": "assistant-reference.sdif-ai.semantic-tokens.json",
     }
     for fixture_name, output_name in MAPPING_REPORTS:
         captures = json.loads((reports_dir / tree_sitter_outputs[fixture_name]).read_text())
