@@ -102,30 +102,30 @@ The Rust `sdif-rs` parser remains the normative source for diagnostics and seman
 
 ## Language Server
 
-`vscode-sdif` acts only as the VS Code client. Diagnostics, hover, completions, and semantic tokens belong to the Rust `sdif-lsp` server.
+`vscode-sdif` orchestrates the Rust `sdif-lsp` language server. By default, it automatically searches for the server binary using the following sequence:
 
-By default, the extension invokes the server command:
+1. **Explicit Path**: If `sdif.server.path` is configured, the extension will attempt to execute that binary directly.
+2. **Bundled Binary**: The extension checks for a pre-compiled, platform-specific binary in the extension's folder (under `bin/` or `server/` matching the user's OS and architecture, e.g., `bin/linux-x64/sdif-lsp` or `bin/win32-x64/sdif-lsp.exe`).
+3. **Workspace Build**: If you are developing SDIF, it checks for sibling development builds (`../sdif-lsp/target/release/sdif-lsp` or `../sdif-lsp/target/debug/sdif-lsp`).
+4. **System PATH**: As a fallback, it will try the command configured under `sdif.server.command` (which defaults to `"sdif-lsp"`) on the system `PATH`.
 
-```bash
-sdif-lsp
-```
+### Version Compatibility
 
-If the command is not on your system `PATH`, you can configure a custom binary path:
+At startup, the client runs `sdif-lsp --version` to verify that the language server matches the version expected by the extension (as declared in the compatibility contract). If a mismatch or compatibility error occurs, VS Code will display a warning notification but will still attempt to run the language server.
 
-```json
-{
-  "sdif.server.command": "/path/to/sdif-lsp",
-  "sdif.server.args": []
-}
-```
+### Settings Configuration
 
-To disable the language server while keeping fallback TextMate highlighting:
+You can configure the server path and args in your VS Code settings:
 
 ```json
 {
-  "sdif.server.enabled": false
+  "sdif.server.path": "",
+  "sdif.server.command": "sdif-lsp",
+  "sdif.server.args": [],
+  "sdif.server.enabled": true
 }
 ```
+
 
 <br>
 
@@ -148,8 +148,8 @@ npm run package
 
 ## Boundaries
 
-- No language server binary is bundled in this extension.
-- No automatic language server download is performed.
+- Platform-specific language server binaries are bundled/distributed internally under `bin/` or `server/` without requiring external system package installation.
+- No automatic download of language server binaries from the internet is performed.
 - Formatting is intentionally out of scope for v1.0.
 - VS Code does not load tree-sitter directly; highlighting integration is mediated by `sdif-lsp` semantic tokens.
 
