@@ -18,17 +18,21 @@ from pathlib import Path
 
 FIXTURE_SDIF_NAME = "highlighting.sdif"
 FIXTURE_SDIF_AI_NAME = "highlighting.sdif.ai"
+FIXTURE_BENCHMARK_NAME = "benchmark-report.sdif"
 TREE_SITTER_REPORTS = (
     (FIXTURE_SDIF_NAME, "highlighting.sdif.tree-sitter-captures.json"),
     (FIXTURE_SDIF_AI_NAME, "highlighting.sdif-ai.tree-sitter-captures.json"),
+    (FIXTURE_BENCHMARK_NAME, "benchmark-report.sdif.tree-sitter-captures.json"),
 )
 SEMANTIC_TOKEN_REPORTS = (
     (FIXTURE_SDIF_NAME, "highlighting.sdif.semantic-tokens.json"),
     (FIXTURE_SDIF_AI_NAME, "highlighting.sdif-ai.semantic-tokens.json"),
+    (FIXTURE_BENCHMARK_NAME, "benchmark-report.sdif.semantic-tokens.json"),
 )
 MAPPING_REPORTS = (
     (FIXTURE_SDIF_NAME, "highlighting.sdif.capture-semantic-map.json"),
     (FIXTURE_SDIF_AI_NAME, "highlighting.sdif-ai.capture-semantic-map.json"),
+    (FIXTURE_BENCHMARK_NAME, "benchmark-report.sdif.capture-semantic-map.json"),
 )
 CAPTURE_TO_SEMANTIC_TYPE = {
     "keyword": "keyword",
@@ -38,9 +42,11 @@ CAPTURE_TO_SEMANTIC_TYPE = {
     "constant": "enum",
     "comment": "comment",
     "string": "string",
+    "number": "number",
     "atom": "string",
     "punctuation": "operator",
 }
+TREE_SITTER_HOME = "/tmp"
 
 
 def main() -> int:
@@ -69,10 +75,13 @@ def main() -> int:
         return 1
 
     fixture_dir = spec_dir / "fixtures" / "editor"
-    fixture_sdif = fixture_dir / FIXTURE_SDIF_NAME
-    fixture_sdif_ai = fixture_dir / FIXTURE_SDIF_AI_NAME
+    fixtures = {
+        FIXTURE_SDIF_NAME: fixture_dir / FIXTURE_SDIF_NAME,
+        FIXTURE_SDIF_AI_NAME: fixture_dir / FIXTURE_SDIF_AI_NAME,
+        FIXTURE_BENCHMARK_NAME: fixture_dir / FIXTURE_BENCHMARK_NAME,
+    }
 
-    for fixture in (fixture_sdif, fixture_sdif_ai):
+    for fixture in fixtures.values():
         if not fixture.is_file():
             print(f"Error: Highlighting fixture not found: {fixture}", file=sys.stderr)
             return 1
@@ -87,13 +96,9 @@ def main() -> int:
         return 1
 
     try:
-        _generate_tree_sitter_reports(
-            workspace_root, fixture_sdif, fixture_sdif_ai, reports_dir
-        )
-        _generate_lsp_semantic_reports(
-            lsp_binary, fixture_sdif, fixture_sdif_ai, reports_dir
-        )
-        _generate_mapping_reports(fixture_sdif, fixture_sdif_ai, reports_dir)
+        _generate_tree_sitter_reports(workspace_root, fixtures, reports_dir)
+        _generate_lsp_semantic_reports(lsp_binary, fixtures, reports_dir)
+        _generate_mapping_reports(fixtures, reports_dir)
     except (OSError, RuntimeError) as exc:
         print(f"Error generating reports: {exc}", file=sys.stderr)
         return 1
@@ -105,6 +110,9 @@ def main() -> int:
     print(f"  - {reports_dir}/highlighting.sdif-ai.semantic-tokens.json")
     print(f"  - {reports_dir}/highlighting.sdif.capture-semantic-map.json")
     print(f"  - {reports_dir}/highlighting.sdif-ai.capture-semantic-map.json")
+    print(f"  - {reports_dir}/benchmark-report.sdif.tree-sitter-captures.json")
+    print(f"  - {reports_dir}/benchmark-report.sdif.semantic-tokens.json")
+    print(f"  - {reports_dir}/benchmark-report.sdif.capture-semantic-map.json")
     return 0
 
 
@@ -130,12 +138,10 @@ def _find_sdif_lsp_binary(workspace_root: Path) -> Path:
 
 def _generate_tree_sitter_reports(
     workspace_root: Path,
-    fixture_sdif: Path,
-    fixture_sdif_ai: Path,
+    fixtures: dict[str, Path],
     reports_dir: Path,
 ) -> None:
     """Run tree-sitter query and write parsed JSON reports."""
-    fixtures = {FIXTURE_SDIF_NAME: fixture_sdif, FIXTURE_SDIF_AI_NAME: fixture_sdif_ai}
     for fixture_name, output_name in TREE_SITTER_REPORTS:
         fixture = fixtures[fixture_name]
         raw_output = _run_tree_sitter_query(workspace_root, fixture)
@@ -148,10 +154,13 @@ def _run_tree_sitter_query(workspace_root: Path, fixture_path: Path) -> str:
     """Run tree-sitter CLI query subcommand and capture output."""
     tree_sitter_dir = workspace_root / "tree-sitter-sdif"
     query_file = "queries/highlights.scm"
+    env = os.environ.copy()
+    env["HOME"] = TREE_SITTER_HOME
 
     result = subprocess.run(
         ["npx", "tree-sitter", "query", query_file, str(fixture_path.resolve())],
         cwd=tree_sitter_dir,
+        env=env,
         capture_output=True,
         text=True,
         check=False,
@@ -183,6 +192,7 @@ def _parse_tree_sitter_captures(
         text = m.group("text")
         if text is None:
             text = _slice_text_by_position(source_text, start, end)
+        text = _trim_trailing_tab_capture(text, end)
         captures.append(
             {
                 "capture": m.group("name"),
@@ -192,6 +202,14 @@ def _parse_tree_sitter_captures(
             }
         )
     return captures
+
+
+def _trim_trailing_tab_capture(text: str, end: dict[str, int]) -> str:
+    """Normalize row-cell captures whose grammar token includes the HTAB separator."""
+    if text.endswith("\t"):
+        end["column"] -= 1
+        return text[:-1]
+    return text
 
 
 def _slice_text_by_position(
@@ -214,19 +232,19 @@ def _slice_text_by_position(
 
 
 def _generate_mapping_reports(
-    fixture_sdif: Path,
-    fixture_sdif_ai: Path,
+    fixtures: dict[str, Path],
     reports_dir: Path,
 ) -> None:
     """Write traceability reports from tree-sitter captures to LSP token types."""
-    fixtures = {FIXTURE_SDIF_NAME: fixture_sdif, FIXTURE_SDIF_AI_NAME: fixture_sdif_ai}
     tree_sitter_outputs = {
         "highlighting.sdif": "highlighting.sdif.tree-sitter-captures.json",
         "highlighting.sdif.ai": "highlighting.sdif-ai.tree-sitter-captures.json",
+        "benchmark-report.sdif": "benchmark-report.sdif.tree-sitter-captures.json",
     }
     semantic_outputs = {
         "highlighting.sdif": "highlighting.sdif.semantic-tokens.json",
         "highlighting.sdif.ai": "highlighting.sdif-ai.semantic-tokens.json",
+        "benchmark-report.sdif": "benchmark-report.sdif.semantic-tokens.json",
     }
     for fixture_name, output_name in MAPPING_REPORTS:
         captures = json.loads((reports_dir / tree_sitter_outputs[fixture_name]).read_text())
@@ -335,12 +353,10 @@ def _has_semantic_token(
 
 def _generate_lsp_semantic_reports(
     lsp_binary: Path,
-    fixture_sdif: Path,
-    fixture_sdif_ai: Path,
+    fixtures: dict[str, Path],
     reports_dir: Path,
 ) -> None:
     """Run sdif-lsp token dump and save results to report files."""
-    fixtures = {FIXTURE_SDIF_NAME: fixture_sdif, FIXTURE_SDIF_AI_NAME: fixture_sdif_ai}
     for fixture_name, output_name in SEMANTIC_TOKEN_REPORTS:
         result = subprocess.run(
             [
