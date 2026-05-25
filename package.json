@@ -77,10 +77,15 @@
           "default": true,
           "description": "Enable the SDIF language server client. Syntax highlighting remains available when disabled."
         },
+        "sdif.server.path": {
+          "type": "string",
+          "default": "",
+          "description": "Optional absolute path to an external sdif-lsp binary. If not specified, the extension will use the bundled binary or look for it in the workspace/PATH."
+        },
         "sdif.server.command": {
           "type": "string",
           "default": "sdif-lsp",
-          "description": "Command used to start the Rust SDIF language server."
+          "description": "Fallback command name or system PATH command used to start the Rust SDIF language server when no path or bundled binary is found."
         },
         "sdif.server.args": {
           "type": "array",
@@ -183,8 +188,10 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "tsc --noEmit -p ./",
-    "test:unit": "tsc -p tsconfig.test.json && node out-test/test/suite/manifest.test.js && node out-test/test/suite/config.test.js && node out-test/test/suite/activation.test.js && node out-test/test/suite/syntax.test.js",
+    "test:unit": "tsc -p tsconfig.test.json && node out-test/test/suite/manifest.test.js && node out-test/test/suite/config.test.js && node out-test/test/suite/activation.test.js && node out-test/test/suite/syntax.test.js && node out-test/test/suite/compatibility.test.js && node out-test/test/suite/package.test.js && node out-test/test/suite/package-release.test.js",
     "test": "npm run test:unit",
+    "package:prepare": "node scripts/prepare-lsp-binaries.mjs",
+    "prepackage": "npm run package:prepare",
     "package": "vsce package"
   },
   "dependencies": {

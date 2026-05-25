@@ -4,3 +4,6 @@ out/
 .vscode-test/
 .DS_Store
 out-test/
+bin/
+dist/
+
