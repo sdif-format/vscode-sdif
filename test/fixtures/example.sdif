@@ -1,13 +1,12 @@
 @sdif 1.0
 kind Dataset
 
-Person people:
-id	name	role
-p1	"Ada Lovelace"	mathematician
-p2	"Grace Hopper"	compiler-pioneer
+people[id,name,role]:
+  p1	"Ada Lovelace"	mathematician
+  p2	"Grace Hopper"	compiler-pioneer
 
 rel:
-p1	inspired	p2
+  p1 inspired p2
 
 rules:
-required	Person.id
+  require(id)

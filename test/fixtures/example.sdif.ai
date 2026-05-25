@@ -1,12 +1,9 @@
 @sdif.ai 1.0
-source_hash sha256:example
+alias[k=kind]
+k Dataset
 
-alias[]:
-p	Person
-
-p people:
-id	name$
-p1	"Ada Lovelace"
+people[id,name$]:
+  p1	"Ada Lovelace"
 
 rel[p1]:
-inspired	p2
+  inspired p2

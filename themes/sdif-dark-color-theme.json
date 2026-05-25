@@ -1,0 +1,76 @@
+{
+  "name": "SDIF Dark",
+  "type": "dark",
+  "semanticHighlighting": true,
+  "semanticTokenColors": {
+    "keyword":   { "foreground": "#569cd6", "bold": true },
+    "type":      { "foreground": "#4ec9b0", "bold": true },
+    "property":  { "foreground": "#9cdcfe" },
+    "variable":  { "foreground": "#dcdcaa" },
+    "enum":      { "foreground": "#4fc1ff" },
+    "string":    { "foreground": "#ce9178" },
+    "number":    { "foreground": "#b5cea8" },
+    "operator":  { "foreground": "#808080" },
+    "comment":   { "foreground": "#6a9955", "italic": true },
+
+    "*.sdifColumn0": { "foreground": "#dcdcaa" },
+    "*.sdifColumn1": { "foreground": "#c586c0" },
+    "*.sdifColumn2": { "foreground": "#4ec9b0" },
+    "*.sdifColumn3": { "foreground": "#ce9178" },
+    "*.sdifColumn4": { "foreground": "#4fc1ff" },
+    "*.sdifColumn5": { "foreground": "#b5cea8" },
+    "*.sdifColumn6": { "foreground": "#9cdcfe" },
+    "*.sdifColumn7": { "foreground": "#d7ba7d" }
+  },
+  "tokenColors": [
+    {
+      "scope": "source.sdif",
+      "settings": { "foreground": "#d4d4d4" }
+    },
+    {
+      "name": "SDIF directive",
+      "scope": ["keyword.control.sdif", "support.function.directive.sdif"],
+      "settings": { "foreground": "#569cd6", "fontStyle": "bold" }
+    },
+    {
+      "name": "SDIF type / table / narrative key",
+      "scope": ["entity.name.type.sdif", "entity.name.class.sdif"],
+      "settings": { "foreground": "#4ec9b0", "fontStyle": "bold" }
+    },
+    {
+      "name": "SDIF column headers",
+      "scope": "variable.other.property.sdif",
+      "settings": { "foreground": "#9cdcfe" }
+    },
+    {
+      "name": "SDIF row identifier",
+      "scope": "variable.other.readwrite.sdif",
+      "settings": { "foreground": "#dcdcaa" }
+    },
+    {
+      "name": "SDIF enum / constant value",
+      "scope": ["constant.other.sdif", "support.constant.sdif"],
+      "settings": { "foreground": "#4fc1ff" }
+    },
+    {
+      "name": "SDIF string",
+      "scope": "string.quoted.double.sdif",
+      "settings": { "foreground": "#ce9178" }
+    },
+    {
+      "name": "SDIF number",
+      "scope": "constant.numeric.sdif",
+      "settings": { "foreground": "#b5cea8" }
+    },
+    {
+      "name": "SDIF operator / punctuation",
+      "scope": ["punctuation.definition.sdif", "punctuation.separator.sdif"],
+      "settings": { "foreground": "#808080" }
+    },
+    {
+      "name": "SDIF comment",
+      "scope": "comment.line.number-sign.sdif",
+      "settings": { "foreground": "#6a9955", "fontStyle": "italic" }
+    }
+  ]
+}

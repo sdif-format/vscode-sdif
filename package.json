@@ -52,6 +52,13 @@
         "path": "./syntaxes/sdif.tmLanguage.json"
       }
     ],
+    "themes": [
+      {
+        "label": "SDIF Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/sdif-dark-color-theme.json"
+      }
+    ],
     "commands": [
       {
         "command": "sdif.restartServer",
@@ -95,6 +102,17 @@
         }
       }
     },
+    "semanticTokenTypes": [
+      { "id": "keyword",  "superType": "keyword",  "description": "SDIF directive names and structural keys." },
+      { "id": "type",     "superType": "type",     "description": "Table names, narrative keys, block identifiers." },
+      { "id": "property", "superType": "property", "description": "Table column headers and alias entries." },
+      { "id": "variable", "superType": "variable", "description": "Table row identifiers and relation subjects." },
+      { "id": "enum",     "superType": "enum",     "description": "Enumerated values: null, true, false and domain constants." },
+      { "id": "string",   "superType": "string",   "description": "Quoted strings, unquoted scalars and narrative text." },
+      { "id": "number",   "superType": "number",   "description": "Numeric literals." },
+      { "id": "operator", "superType": "operator", "description": "Punctuation: @, \"\"\", brackets, delimiters." },
+      { "id": "comment",  "superType": "comment",  "description": "Line comments starting with #." }
+    ],
     "semanticTokenModifiers": [
       {
         "id": "sdifColumn0",
