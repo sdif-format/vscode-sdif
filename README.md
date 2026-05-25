@@ -26,6 +26,8 @@ sdif-spec
 
 The Rust `sdif-rs` parser remains the normative source for diagnostics and semantic parsing. `sdif-lsp` uses `sdif-rs` for diagnostics, hover, and completions where semantic parsing applies, and uses `tree-sitter-sdif` for editor highlighting tokens.
 
+Editor highlighting verification is based on tree-sitter captures and decoded LSP semantic tokens. Screenshots are only manual diagnostics, not verification evidence.
+
 ## Language server
 
 `vscode-sdif` is only the VS Code client. Diagnostics, hover, completions, and semantic tokens belong in the Rust `sdif-lsp` server.
