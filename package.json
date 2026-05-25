@@ -94,7 +94,72 @@
           "description": "Trace communication between VS Code and the SDIF language server."
         }
       }
-    }
+    },
+    "semanticTokenModifiers": [
+      {
+        "id": "sdifColumn0",
+        "description": "SDIF table column 0."
+      },
+      {
+        "id": "sdifColumn1",
+        "description": "SDIF table column 1."
+      },
+      {
+        "id": "sdifColumn2",
+        "description": "SDIF table column 2."
+      },
+      {
+        "id": "sdifColumn3",
+        "description": "SDIF table column 3."
+      },
+      {
+        "id": "sdifColumn4",
+        "description": "SDIF table column 4."
+      },
+      {
+        "id": "sdifColumn5",
+        "description": "SDIF table column 5."
+      },
+      {
+        "id": "sdifColumn6",
+        "description": "SDIF table column 6."
+      },
+      {
+        "id": "sdifColumn7",
+        "description": "SDIF table column 7."
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "sdif",
+        "scopes": {
+          "*.sdifColumn0": [
+            "variable.other.readwrite.sdif"
+          ],
+          "*.sdifColumn1": [
+            "constant.other.sdif"
+          ],
+          "*.sdifColumn2": [
+            "entity.name.type.sdif"
+          ],
+          "*.sdifColumn3": [
+            "string.quoted.double.sdif"
+          ],
+          "*.sdifColumn4": [
+            "support.constant.sdif"
+          ],
+          "*.sdifColumn5": [
+            "constant.numeric.sdif"
+          ],
+          "*.sdifColumn6": [
+            "entity.name.function.sdif"
+          ],
+          "*.sdifColumn7": [
+            "variable.parameter.sdif"
+          ]
+        }
+      }
+    ]
   },
   "scripts": {
     "compile": "tsc -p ./",
