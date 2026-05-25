@@ -73,7 +73,7 @@ To test the universal packaging process locally:
 
 ## CI/CD Release Automation
 
-We automate release builds via GitHub Actions in [.github/workflows/vscode-sdif-release.yml](https://github.com/sdif-format/blob/main/.github/workflows/vscode-sdif-release.yml).
+We automate release builds via GitHub Actions in [.github/workflows/vscode-sdif-release.yml](https://github.com/sdif-format/vscode-sdif/blob/main/.github/workflows/vscode-sdif-release.yml).
 
 The workflow pipeline operates as follows:
 

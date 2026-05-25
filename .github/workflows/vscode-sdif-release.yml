@@ -1,0 +1,116 @@
+name: vscode-sdif-release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-lsp:
+    name: Build LSP (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-latest
+            binary_name: sdif-lsp
+            src_path: sdif-lsp/target/release/sdif-lsp
+          - name: darwin-arm64
+            os: macos-latest
+            binary_name: sdif-lsp
+            src_path: sdif-lsp/target/release/sdif-lsp
+          - name: win32-x64
+            os: windows-latest
+            binary_name: sdif-lsp.exe
+            src_path: sdif-lsp/target/release/sdif-lsp.exe
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Compile sdif-lsp
+        run: cargo build --release
+        working-directory: sdif-lsp
+
+      - name: Upload LSP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdif-lsp-${{ matrix.name }}
+          path: ${{ matrix.src_path }}
+
+  release-extension:
+    name: Package VS Code Extension
+    needs: build-lsp
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: vscode-sdif/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: vscode-sdif
+
+      - name: Create dist directory
+        run: mkdir -p vscode-sdif/dist/lsp-binaries
+
+      - name: Download Linux x64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: sdif-lsp-linux-x64
+          path: vscode-sdif/dist/lsp-binaries/linux-x64
+
+      - name: Download macOS arm64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: sdif-lsp-darwin-arm64
+          path: vscode-sdif/dist/lsp-binaries/darwin-arm64
+
+      - name: Download Windows x64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: sdif-lsp-win32-x64
+          path: vscode-sdif/dist/lsp-binaries/win32-x64
+
+      - name: Ensure correct binary filenames
+        run: |
+          mv vscode-sdif/dist/lsp-binaries/linux-x64/sdif-lsp* vscode-sdif/dist/lsp-binaries/linux-x64/sdif-lsp || true
+          mv vscode-sdif/dist/lsp-binaries/darwin-arm64/sdif-lsp* vscode-sdif/dist/lsp-binaries/darwin-arm64/sdif-lsp || true
+          mv vscode-sdif/dist/lsp-binaries/win32-x64/sdif-lsp* vscode-sdif/dist/lsp-binaries/win32-x64/sdif-lsp.exe || true
+
+      - name: Compile extension
+        run: npm run compile
+        working-directory: vscode-sdif
+
+      - name: Assemble release binaries
+        run: npm run package:prepare -- --release
+        working-directory: vscode-sdif
+
+      - name: Run extension test suite
+        env:
+          SDIF_RELEASE_BUILD: 1
+        run: npm test
+        working-directory: vscode-sdif
+
+      - name: Package VSIX
+        env:
+          SDIF_RELEASE_BUILD: 1
+        run: npx vsce package --no-git-tag-version --out vscode-sdif-universal.vsix
+        working-directory: vscode-sdif
+
+      - name: Upload packaged VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-sdif-vsix
+          path: vscode-sdif/vscode-sdif-universal.vsix
